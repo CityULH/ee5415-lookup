@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="cx14TcPGtqoXFGskHjm8Tz">
+<head data-page-node-id="GpVG4ga9w85QIIXXkcMuGb">
+<meta charset="UTF-8" data-page-node-id="ZGTjl4wpHClx4lAOO6HCLI">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="weczzQvvj8bdR9YJ0vt1Nv">
+<title>EE5415 API Key 自助查询</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+         background: #f4f6fa; min-height: 100vh; display: flex;
+         justify-content: center; padding: 40px 16px; color: #1c2733; }
+  .card { background: #fff; width: 100%; max-width: 520px; border-radius: 14px;
+          box-shadow: 0 6px 24px rgba(30,50,80,.08); padding: 32px 28px; height: fit-content; }
+  h1 { font-size: 20px; margin-bottom: 6px; }
+  .sub { font-size: 13px; color: #67707c; margin-bottom: 24px; line-height: 1.6; }
+  label { font-size: 13px; font-weight: 600; display: block; margin-bottom: 8px; }
+  .row { display: flex; gap: 10px; }
+  input { flex: 1; border: 1.5px solid #d4dae2; border-radius: 9px; padding: 12px 14px;
+          font-size: 16px; letter-spacing: 1px; outline: none; transition: border-color .15s; }
+  input:focus { border-color: #2563eb; }
+  button { background: #2563eb; color: #fff; border: none; border-radius: 9px;
+           padding: 12px 22px; font-size: 15px; font-weight: 600; cursor: pointer; }
+  button:disabled { background: #9db8e8; cursor: wait; }
+  .msg { margin-top: 16px; font-size: 14px; border-radius: 9px; padding: 12px 14px; display: none; }
+  .err { background: #fdecec; color: #b42318; display: block; }
+  .result { margin-top: 20px; border: 1.5px solid #dbe4f0; border-radius: 12px;
+            padding: 18px 16px; background: #f8fafd; display: none; }
+  .who { font-size: 14px; color: #445; margin-bottom: 10px; }
+  .keybox { display: flex; gap: 8px; align-items: stretch; }
+  .key { flex: 1; font-family: Consolas, Menlo, monospace; font-size: 14px;
+         background: #0f172a; color: #7ff0a8; border-radius: 8px; padding: 12px 12px;
+         word-break: break-all; line-height: 1.5; user-select: all; }
+  .copy { background: #0e9f6e; padding: 0 16px; }
+  .tips { margin-top: 18px; font-size: 12.5px; color: #67707c; line-height: 1.8; }
+  .tips code { background: #eef2f7; padding: 1px 6px; border-radius: 5px;
+               font-family: Consolas, monospace; font-size: 12px; }
+  #usage { margin-top: 16px; border-top: 1px dashed #d8e0ea; padding-top: 14px; display: none; }
+  .u-head { font-size: 13px; font-weight: 700; color: #33404f; display: flex;
+            justify-content: space-between; align-items: baseline; }
+  .u-head .time { font-weight: 400; font-size: 11.5px; color: #8a94a0; }
+  .bar { margin-top: 10px; height: 12px; background: #e6ebf2; border-radius: 6px; overflow: hidden; }
+  .fill { height: 100%; width: 0; border-radius: 6px; background: #2563eb;
+          transition: width .6s ease; }
+  .fill.warn { background: #d97706; }
+  .fill.hot { background: #dc2626; }
+  .u-nums { margin-top: 8px; font-size: 13px; color: #445; line-height: 1.7; }
+  .u-nums b { font-size: 15px; }
+</style>
+</head>
+<body data-page-node-id="uZzSQSLSYmqFECcc0ABSk3">
+<div class="card" data-page-node-id="TQMoCPPia5Hesgp8M89TpB">
+  <h1 data-page-node-id="4oVCRHVuAw4nrynIkLwD3D">EE5415 · API Key 自助查询</h1>
+  <p class="sub" data-page-node-id="nZ1ejq0nCSSx6uUXvZYkdi">输入你的学号即可查看本学期分配给你的 TokenHub API Key。<br data-page-node-id="wnNpABWNxmtm5J5Hu0n63m">
+     请妥善保管，<b data-page-node-id="VKZQru8DOoP5wrjnYrisvq">不要分享给任何他人</b>。额度为每月 150M tokens。</p>
+  <label for="sid" data-page-node-id="BkEsoY6DHuGA33vV8Ezmer">学号</label>
+  <div class="row" data-page-node-id="HioEFsxYWraUzAqMEGlPZ9">
+    <input id="sid" inputmode="numeric" placeholder="请输入 8 位学号" autocomplete="off" data-page-node-id="H7yHEFzDnvBQY6jLvijaKT">
+    <button id="go" onclick="lookup()" data-page-node-id="9cO0hAYyV02BrjfjDC41AB">查询</button>
+  </div>
+  <div id="msg" class="msg" data-page-node-id="OYQQjIjNvrqMF9N6RReRf9"></div>
+  <div id="result" class="result" data-page-node-id="xxg9tdQmgCz3jgH2pKBG92">
+    <div class="who" id="who" data-page-node-id="Rrl5QFGJZH8IxJKnhGnd4D"></div>
+    <div class="keybox" data-page-node-id="r2wsEZljnceD1D5mBmba0x">
+      <div class="key" id="key" data-page-node-id="LB4IknQmQ7keHWx9prZroS"></div>
+      <button class="copy" onclick="copyKey()" data-page-node-id="GqMevqzomaRkxAPzX9DLdQ">复制</button>
+    </div>
+    <div class="tips" data-page-node-id="VkLNtmPqVd7yYLfCzR5FUG">
+      <b data-page-node-id="iUA8N6oxZyHoOXbMrCGS8E">使用方式</b><br data-page-node-id="P31oIm1e369Cg4aOg9cBko">
+      Base URL：<code data-page-node-id="6XqVhPnTqsysIt995vD2KV">https://tokenhub.tencentmaas.com/v1</code><br data-page-node-id="d5Ni6weJkYCips2HUgetrH">
+      月度额度：150M tokens（每月 1 日重置，耗尽当月不可再调用）<br data-page-node-id="ErDhgitMFimIhzh6wEtoCd">
+      可用模型：24 个文本语言模型（不含 Kimi K3 / GLM-5.3）<br data-page-node-id="ZGbalrjDTDHLqUYbDa0fN2">
+      查询遇到问题请联系课程老师。
+    </div>
+    <div id="usage" data-page-node-id="QTl8gEWGAMX1IZynn5YcoM">
+      <div class="u-head" data-page-node-id="CGX6fk0OyQxtCHjHW3E3nQ"><span data-page-node-id="8dPhRmhUDUDCKjI0YlNI0L">本月 Token 用量</span><span class="time" id="u-updated" data-page-node-id="Ovv0HtgfueYN8K2ztEabna"></span></div>
+      <div class="bar" data-page-node-id="dj12bAYCrV3zmVNvH7k1eL"><div class="fill" id="u-fill" data-page-node-id="tSNfqVQrZAvSKqNbEm5DBg"></div></div>
+      <div class="u-nums" id="u-nums" data-page-node-id="xN7qdalH9DJFXXAByNUT0D"></div>
+    </div>
+  </div>
+</div>
+<script>
+const DATA = [{"n":"GUO Mingrui","s":"LKnwlsX5l7L2GiL10uLYlQ==","h":"U9XKdTXMmr2ayKd2Ip7soA==","c":"WhMiSSUgQSfaQCNx2LjkUmcCnub/STna6PMrXMwzcxUuFvxWA5ug4Nn8SdqHwHg8lO20"},{"n":"RUAN Likun","s":"GwjDyCbYv2fbAbpI7FQxOQ==","h":"TraK3tSS6WhiIlJRudWfIA==","c":"XjMiL7sXgM31jrf7LL3L15bxY3J6D+2d1+g8kCssNgib4gIMr2LyekVvnzv1Lcp5awGl"},{"n":"YANG Jiajun","s":"8h+dy0xhV1x6zEl8GS9zHg==","h":"baAaqINOp2qnzCfyqFCRyA==","c":"XHFH16rtgYB1RiHOjDyGZ/JX/uNC/3oihM495AemPTaCznf+Q6REYFwG7oSNgRsIf8os"},{"n":"HUANG Junbo","s":"BwbxO3JQLA/Y0RKlTbt+Dg==","h":"tlTSoOZ0YHwb+yClUcxksw==","c":"P3ilCM3rwAcd8u9HF2bSRc44jL04X63CJw9pRWdPulBRcyEUjDa1BgcjzXg48gfD+KUI"},{"n":"WANG Jianyi","s":"jfnL5U2oon3fMtq1omHxLQ==","h":"mEt3xCP5jV8AwzIaUF7nQw==","c":"8BLTp1HFRH1zbYpuFYz+2ahchEsvZLu3lCMJ0/4C6pwQFT0cEVaf3mWfWTCvT09Xr7wu"},{"n":"WANG Jiarui","s":"b6YaY8iHzvqWBqGZd9yV/A==","h":"OX0oOtPNsrk8LYCTnwxYWQ==","c":"qmrp52DEC4gN9pVJlEwgWCbZ5IetjQ4iJ/OQxX+UaGtD2Gh+Iu2VkUBpPODozhdHFuln"},{"n":"WANG Jiahe","s":"YksHsCDF1oq0P+s3vRn8Qw==","h":"ziU4sG0ZKl+ZMSIr8Nnbyg==","c":"A+57NsqGUO1uifZ4eGs0dgP5Ug5/9PkauCDKu2vKzMFAcNFNTmw2VzaoLHPXbOMyT9k6","us":"q6MptBYAOjCdNW0wko5mGA==","uc":"ScIX8JRdK0KHpzL25HmGVdRVmn6cL+8a9x3xbWcnxQQL54W8lfpNRnbt9/XIKK+0S4c89HIWK/BwvEJd"},{"n":"WANG Chenguang","s":"1kyae58O5NTmZlYxiIRYsw==","h":"U2vZlwN/KDiG5VqdC0pBuQ==","c":"vyMLBMOYAZcAR9ZngCgJ5xmCxt3P0PQEOzHoL/0I3Rac1pxOTYzsiRRHAs/1t1jW4Er3"},{"n":"YANG Zhengxu","s":"K/TAEk5uumMUm2BhJDREIg==","h":"ldxrbXO1n26mPaF0v3/NLw==","c":"w/OE/Y1i17piuLIsMufM35UjdSMNon3ZBDAxquypgmKN8hq5rz+m15KiJXZOj0+UvjtR","us":"7gnsNMe3WRrey144EWiISw==","uc":"Ubhxr1XlkxwDqVv3jHrltgp4TRkEXZz+x5p1ubx8qMmwV6MPXSjVah7tAIaI6XYRVCxiJxUXbtES3UkVyEFo7X32"},{"n":"CHU Guxuan","s":"oxA7BDnC+aoEEr35wUcM4w==","h":"p2DZrmH7imVYO02F4nijcA==","c":"JqPnSwUrsHrbitLeyNjcMKL4Tobyj1x29XP/ltHZPLluFs7elX6en7vVGHeeWz3Kipip"},{"n":"ZHOU Mutian","s":"Ky+B1YzJWNolstu3YHk75w==","h":"ZaQ63UpoR6hZQyCdBjcWhg==","c":"X2lf29HGyjkhYCfVO9ZOO+tUEtfX/KWS4tIjxbeUzv5H+j6mMADoEtPPySqMVSrWg78o","us":"KZa1Zflx50wWwRhd4lMbAA==","uc":"HrfVWYmNRk3wLWFgNZ4gb0PL33FRHp+N3KC+xU9QMvHKHv/9hNJ9Psllnrk7"},{"n":"ZHANG Yikang","s":"7z47Q7D9EGUxUVVIjBRE+A==","h":"i/tlilApC8qyNRGPVMa2aA==","c":"1EWc9cjfx0/aT5ubd918WmSX7uUfj/FdGTjLPzepWkmqqP4/PQVD8xNY30zL+ZhkL2xE","us":"bM8CVOonU7tFbFQ6VrB/wQ==","uc":"pZgOGr+OQEfA6/EcWnDeXs+89/RxqqIwJTL0z8S0X0v5bCZnrSW45oc+syw1jqLstNTF87UNXA=="},{"n":"XU Yizhen","s":"z8Q5z4Ohs8QBloJwWynsjw==","h":"dDsyBckOU6pMB+yhCdRQnw==","c":"3idMqIcLEepED+o87E5/L0+C9A7tfjUAC/FMyC9snC9ZrrgJvX6IFPq9zj5A7i8Kqj6V"},{"n":"ZHANG Haoran","s":"To9Dll19ydUwI12weLmjpQ==","h":"S0da0v2+6ChrKUuABEqUdQ==","c":"n6nKMYi5/HSVC/BoBgwbES4lUzEhBGnDhLwx+SS3WwMPjhth/CGFq202ocfy0JHpQZLu","us":"c7BQYiudw5R8eX1wSY1BhQ==","uc":"7+f7aa64KbvigzdE7mG4B+vDYfKPTLqfVKxbmcustqCtByka9a5CzD1HUyiSLjosK1pPy4txjql+OOMv"},{"n":"SUN Ao","s":"naCP2PRr8TpH+HN0yxcz1g==","h":"EVIcDv9Va0HxCOsJ+NfMkw==","c":"8S3m8q1G8fjsRUuYAR/5I7t2CDAUrUigBT7o7lhHQnZ/Ew9oYGrLB6QL4+AAfjnMd8j+"},{"n":"SONG Mingxu","s":"7MTJLzK2eLZS8k8G39zqoQ==","h":"frlfxUJnS5f8Yq60Z83uug==","c":"BJEsNYV57/rYQfgOIdgfmk6PwoxfBEdt4oqu/SsPlYd4z1yjp73ClQaL1ft3h5IzIIlz"},{"n":"LIU Zhe","s":"gqJzpVbsx4cLncT24tuSoQ==","h":"g7cZ8NywLkiC11Obc3p4WA==","c":"aor4tFq7GR1ewDxHFWzFgw49iHSzp9GfJ66YNLa5/Qo1BTEcDjNVpMoxlfzNxr+uv7zS","us":"d7RdNLL+zZtHGrt93079Sg==","uc":"/zgpl41mFCrvLpboucwkZ61LbELVJC11q+LgkV4NgJpcrvejAcriEsOMqIfPNbFsyqBFkryfFhj3Q2x4fvT08h9PEN4="},{"n":"TAN Zhanhang","s":"FOLQVx/rViOM7DlTF5z+8Q==","h":"OPoKzneQ/60izuD0O/q4rQ==","c":"L3JC2wlZ08BUOW+M5TjaU1pS9CkS/m/dgyfe5ScFcI8yF6TMnjPKQjK40qp/Xkn/FV6P"},{"n":"ZHAO Yonghao","s":"Nhrxl+Bx+sBC9SvuY0nfJA==","h":"ivj/5xD2+JFsCLO02h8lHw==","c":"vWErXWeapa6hW+1I3RGLKkrkHMQQt0EFhEIBx4bJjSb6+2Lh3dDPpI7HnJvlXfbrnPSQ","us":"VDqX1UEyBpUullUm3VVhVg==","uc":"qL3lUCabid7odWBHfPXnPcrsSngqJKwNnLiiGc/3b4FXK1clutAB6q41cAY="},{"n":"ZHENG Bowei","s":"C2plJrrrLVKbvOwc8ujv4A==","h":"O4GOxPgI63zw1+nkey6sCA==","c":"bjHBUyg5loYN8Uh2DpyjyYCRhh4XIRR2+aveLPf0ZkhYm3BTKZp+x1uULK8XdE3wKDOg"},{"n":"CHEN Boran","s":"ZZTb4jNPDs5nrGB1IwhaPA==","h":"a81+GGXFQ4GoypN2Ae1YbA==","c":"11g9H6/1xWjieK4DOBK54HuqoaPSFyQgJp5BSSD3Q0WKdousyTuHtRmUkzLcNG5gP6d7","us":"qOVKWQDZqpYkBzCVf9OAHg==","uc":"Gj8+hLN14f7dSU33v8zpVje2Put1wjV+MN31wNvDMVyT9h/P2ZQT0/rc3Q=="},{"n":"CHEN Xiaoyang","s":"++Yg7U6/MwVd7o/eyAfXuw==","h":"oZvJ/s6OOJHLsAeny3seOg==","c":"MNu82jRj7y57jRt/s7B1egmlUM+uX4KPsTaazHQpv4jOSKBFLmtBUKP/83eUl8mJ583s"},{"n":"HUANG Boyan","s":"9+1PP/dLDLYOBhzWbBN92g==","h":"0NTnq6ykdtzLQw6jQYGJ6Q==","c":"jTbNSPTpnfApnJ89vUBCirOsQawjM6EeUVbcLsBEBj9sqZtfniuIH0WZ80wQLfdu8B3z","us":"9M4gzYbVtuIdfR5XVyvgGQ==","uc":"6eVBkCaZnFr9Df2I170T4M6T6t6qCfe3gLIzF3w8X4u3jBPEYK1I7OhDQh8XH9M27InLx8AZooSdRfYf"},{"n":"HUANG Yiwei","s":"5k6TvSiyq/WDVvmPORAfFQ==","h":"hLLm3uFEt0J9GZQaAhtPFw==","c":"YUn0eIwzGdoJPhNVn4y8tRjUW3Wz+MxR2bKvghVCFuXOndoX8WDsYMjbTUA8DdHYcxxg","us":"2cLlo511klWckmyV8uT2VQ==","uc":"rWp44hZYsQ8sJ1z/tdv51O5ZZLK2zHelMB5T36U6yDJUXF1aeZ4yH1c0Oas="},{"n":"HUANG Yulang","s":"LfVnId1mfPpUAgA0XArh+A==","h":"bf3Y5TFQvfTypFPbf4xjvw==","c":"+qOGU5Nmg9MTHBr5ww1ve1uRPSqyCg+ZhLSkqYcgE8cOFqkF8fnFjuzfmtAhjRAaO2kG","us":"heyPiKvDUOZnPpVDDWSksQ==","uc":"Bqd8EnCxxi2ppSGqStkcgc9TSAqjiQGoANRUv/OHaO0cGocHqodiaxOY1sUi2nOYbSRJnxoEKT1XlM86ZQ=="},{"n":"LEI Shengyang","s":"7eAPZ7vCPttvUTENho7xCA==","h":"JQC51HXd/Wjv6kGeoUI8ag==","c":"XG5CSqLk7npfLh1N3hgbXef8ihja2D07eesLDzTP2h8Wq1T7I4y+1SJAOuu9Z/Bw/EI4","us":"lod1DtIH85MR1d96jeGRig==","uc":"9o3w1Z0a5WQ4u0f+WgyTgmhR8o4wx35mUZ7mNf8HxvLoqw8XxYD0SZkkSMvvTlK8tQE6"},{"n":"HUO Cheng","s":"uz2cSdg29C0HdGKv1jCyrg==","h":"sQUFLanNPa/FYja8FVuzEA==","c":"zzOxe1cevNOpF9hdvf2O3DRVcfDml4N5racmY905cLcQ3cRl56KJC4xLIf8/jLjNb5d0"},{"n":"GONG Huanpeng","s":"kRIChbGgTV5Qyr2pZ2w/MA==","h":"jdaJgnZfKpmmMnR5NmAQpg==","c":"lJZE1CQyuIQErCcQ8WkKgZWgY/Z7kj+Wo/GnIEFT3kzcuk6OY1l8WBgjXrL4pNp326Ur","us":"w39vty4wYV9DgNQewP7C1Q==","uc":"DMG7xx0gbW5vfyo84BZq815getGPgOUvUaCQbK1h2cQ5CA8nlBsw5T92ZY7MXgdExjbXAUvWByAEw4iO"},{"n":"LI Jiarui","s":"xSVoXkjU2RCY0V4ueuC+WA==","h":"Y8OomOq4LcJVxh7dPWUMFg==","c":"IIl24qWvAxfzLoZFmrl7U5l0ZAPc9llyJewdbZbbT89Q4PM5ioIkY0l2BnybQ7baPg+r","us":"EWSn99yAgHlqTU+2xgEhJA==","uc":"u3h33BgulziNBn1iVNtKx8ZJBlU97sUNOo7BJwyh4c9Acb42Ly9brflV0jdBdV9EP9WOPMEK"},{"n":"LUO Jiaxin","s":"ERokwC148VK2xMEeep12pA==","h":"S/umCEmUYrlAqR/QnKp4lA==","c":"dsOge6XqQg+CI695i9xOPdlcofgdPSWjg1Cf2K+ehr0e2wd8asuZ7SRJg4R0U/+Lfl5K"},{"n":"CHEN Siyan","s":"4ygphqmh2iUpxl3jEoM/RQ==","h":"U53tbXdPI9EDzdizbxBEvQ==","c":"OzoXB9qJZVfXDFBXawsJoO7h6iB/ti8Sdu/xL7igs1OZ9uQf/+o2DQLiArL/gcGVqfUn"},{"n":"YANG Yishuo","s":"dyK7Azk/tEz3qfeqtaMHxQ==","h":"4ZMcHwZKQ0/bKvf4tsuM4A==","c":"87wU1WrWCNGUBZW0Q7/O+u3/Va56s/6o4G9uhRbRig8UoreMzkayLzrAojMGaxaRqroL","us":"r5LqwonPU0xysdr5Y5nDRA==","uc":"biBUI1hV1KAsk+W3dUaV1EWbr4unvMzuDI2RFeW+Gb2MT/e0fbANG08vqOEQq4RjJoDVtqDEaCO5Lmu5xA=="},{"n":"CHEN Jinyu","s":"HDC5jjAV8WbBESCore1i3Q==","h":"Exc+sLktlS2UjE3QxjS1mQ==","c":"sQcy4k0mieWPGRX3IDwpwIzEbUQoBbchkZEKZ+09AfbXvvaeHDTk/96/itca9cewSboQ"}];
+const META = {"uupdated": "2026-09-09 08:56", "umonth": "2026-09"};
+const QUOTA = 150000000;
+const ITER = 200000;
+const enc = new TextEncoder();
+
+async function sha256(bytes) {
+  return new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+}
+async function derivePad(sid, salt, len) {
+  const km = await crypto.subtle.importKey("raw", enc.encode(sid), "PBKDF2", false, ["deriveBits"]);
+  return new Uint8Array(await crypto.subtle.deriveBits(
+    { name: "PBKDF2", hash: "SHA-256", salt: salt, iterations: ITER }, km, len * 8));
+}
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const b64e = b => btoa(String.fromCharCode(...b));
+const eq = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
+
+let currentKey = "";
+async function lookup() {
+  const sid = document.getElementById("sid").value.trim();
+  const msg = document.getElementById("msg");
+  const btn = document.getElementById("go");
+  msg.className = "msg"; msg.style.display = "none";
+  document.getElementById("result").style.display = "none";
+  if (!/^\d{6,12}$/.test(sid)) {
+    msg.textContent = "请输入正确的学号（纯数字）。";
+    msg.className = "msg err"; return;
+  }
+  btn.disabled = true; btn.textContent = "解密中…";
+  try {
+    let hit = null, pad = null;
+    for (const r of DATA) {
+      const salt = b64(r.s);
+      const h = (await sha256(concat(salt, enc.encode(sid)))).slice(0, 16);
+      if (eq(h, b64(r.h))) { hit = r; pad = await derivePad(sid, salt, b64(r.c).length); break; }
+    }
+    if (!hit) {
+      msg.textContent = "未找到该学号，请确认是否在 EE5415 名单内；如确认无误请联系老师。";
+      msg.className = "msg err"; return;
+    }
+    const ct = b64(hit.c);
+    currentKey = String.fromCharCode(...ct.map((b, i) => b ^ pad[i]));
+    document.getElementById("who").textContent = "✅ 已验证：这是 " + hit.n + " 同学的 Key";
+    document.getElementById("key").textContent = currentKey;
+    document.getElementById("result").style.display = "block";
+    renderUsage(sid, hit);
+  } finally {
+    btn.disabled = false; btn.textContent = "查询";
+  }
+}
+function concat(a, b) { const r = new Uint8Array(a.length + b.length); r.set(a); r.set(b, a.length); return r; }
+function fmt(n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + "M";
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + "K";
+  return String(n);
+}
+async function renderUsage(sid, hit) {
+  const box = document.getElementById("usage");
+  if (!hit.us) { box.style.display = "none"; return; }
+  try {
+    const salt = b64(hit.us), ct = b64(hit.uc);
+    const pad = await derivePad(sid + "#usage", salt, ct.length);
+    const u = JSON.parse(String.fromCharCode(...ct.map((b, i) => b ^ pad[i])));
+    const pct = Math.min(u.total / QUOTA * 100, 100);
+    const fill = document.getElementById("u-fill");
+    fill.style.width = Math.max(pct, 1.5) + "%";
+    fill.className = "fill" + (pct >= 90 ? " hot" : pct >= 70 ? " warn" : "");
+    document.getElementById("u-updated").textContent = "数据截至 " + (META.uupdated || "—") + " · 每日更新";
+    document.getElementById("u-nums").innerHTML =
+      "已用 <b>" + fmt(u.total) + "</b> / 150M tokens（" + pct.toFixed(1) + "%）· 剩余 " + fmt(Math.max(QUOTA - u.total, 0)) +
+      "<br>输入 " + fmt(u.input) + " · 输出 " + fmt(u.output) + (u.cache ? " · 缓存命中 " + fmt(u.cache) : "");
+    box.style.display = "block";
+  } catch (e) { box.style.display = "none"; }
+}
+async function copyKey() {
+  try { await navigator.clipboard.writeText(currentKey); }
+  catch (e) {
+    const t = document.createElement("textarea"); t.value = currentKey;
+    document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove();
+  }
+  const b = document.querySelector(".copy"); b.textContent = "已复制 ✓";
+  setTimeout(() => b.textContent = "复制", 1500);
+}
+document.getElementById("sid").addEventListener("keydown", e => { if (e.key === "Enter") lookup(); });
+</script>
+</body>
+</html>
